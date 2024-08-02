@@ -1,0 +1,14 @@
+name: popupfaucet
+
+plugins:
+ - name: solidity
+
+dependencies:
+ - name: OpenZeppelin
+   github: OpenZeppelin/openzeppelin-contracts
+   version: 5.0.2
+
+solidity:
+ import_remapping:
+  - "@openzeppelin=OpenZeppelin/5.0.2"
+
