@@ -7,6 +7,9 @@ dependencies:
  - name: OpenZeppelin
    github: OpenZeppelin/openzeppelin-contracts
    version: 5.0.2
+ - name: web3
+   github: https://github.com/ethereum/web3.py
+   version: 6.19.0
 
 solidity:
  import_remapping:
