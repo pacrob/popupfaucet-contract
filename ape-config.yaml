@@ -2,6 +2,8 @@ name: popupfaucet
 
 plugins:
  - name: solidity
+ - name: optimism
+ - name: base
 
 dependencies:
  - name: OpenZeppelin
