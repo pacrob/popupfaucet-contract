@@ -9,6 +9,7 @@ contract Faucet is Ownable {
     constructor(address initialOwner) Ownable(initialOwner) {}
 
     mapping(bytes32 => uint256) public eventFunds;
+    mapping(bytes32 => bool) public eventNameTaken;
 
     event PaymentReceived(bytes32 hashedCode, uint256 amount, address sender);
     event DripSent(address recipient, uint256 amount);
@@ -22,8 +23,10 @@ contract Faucet is Ownable {
 
     function seedFunds(string calldata eventCode) external payable {
         require(msg.value > 0, "No Ether sent");
+        require(eventNameTaken[hashedEventCode(eventCode)] == false, "Event already exists");
 
         eventFunds[hashedEventCode(eventCode)] += msg.value;
+        eventNameTaken[hashedEventCode(eventCode)] = true;
 
         emit PaymentReceived(hashedEventCode(eventCode), msg.value, msg.sender);
     }
@@ -40,7 +43,14 @@ contract Faucet is Ownable {
 
         emit DripSent(recipient, dripAmount);
     }
+    
+    function eventNameAvailable(string calldata eventCode) external returns (bool) {
+        return !eventNameTaken[hashedEventCode(eventCode)];
+    }
 
+    function eventFundsAvailable(string calldata eventCode) external returns (uint256) {
+        return eventFunds[hashedEventCode(eventCode)];
+    }
 
     function withdraw() onlyOwner external {
         payable(msg.sender).transfer(address(this).balance);
