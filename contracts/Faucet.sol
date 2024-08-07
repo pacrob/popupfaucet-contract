@@ -12,13 +12,13 @@ contract Faucet is Ownable {
     mapping(bytes32 => bool) public eventNameTaken;
 
     event PaymentReceived(bytes32 hashedCode, uint256 amount, address sender);
+    event TopUpReceived(bytes32 hashedCode, uint256 amount, address sender);
     event DripSent(address recipient, uint256 amount);
     event LogData(bytes32 data);
+    event LogBool(bool bool_data);
 
     function hashedEventCode(string calldata eventCode) private returns (bytes32) {
-        bytes32 data = keccak256(abi.encodePacked(eventCode));
-        emit LogData(data);
-        return data;
+        return keccak256(abi.encodePacked(eventCode));
     }
 
     function seedFunds(string calldata eventCode) external payable {
@@ -43,7 +43,16 @@ contract Faucet is Ownable {
 
         emit DripSent(recipient, dripAmount);
     }
-    
+
+    function topUp(string calldata eventCode) external payable {
+        require(msg.value > 0, "No Ether sent");
+        require(this.eventNameAvailable(eventCode) == false, "Event has to be created already");
+
+        eventFunds[hashedEventCode(eventCode)] += msg.value;
+
+        emit TopUpReceived(hashedEventCode(eventCode), msg.value, msg.sender);
+    }
+
     function eventNameAvailable(string calldata eventCode) external returns (bool) {
         return !eventNameTaken[hashedEventCode(eventCode)];
     }

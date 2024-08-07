@@ -45,3 +45,17 @@ def test_not_owner_cannot_withdraw(acct1, acct2, contract_faucet):
     with pytest.raises(ContractLogicError):
         contract_faucet.withdraw(sender=acct2)
     assert contract_faucet.balance == drip_amount * 5
+
+
+def test_top_up(acct1, contract_faucet):
+    contract_faucet.seedFunds("devcon", sender=acct1, value=drip_amount * 10)
+    assert contract_faucet.eventFunds(hashed_code) == drip_amount * 10
+    txr = contract_faucet.topUp("devcon", sender=acct1, value=drip_amount * 2)
+    assert contract_faucet.eventFunds(hashed_code) == drip_amount * 12
+
+
+def test_top_up_fails_if_the_event_code_doesnt_exist(acct1, contract_faucet):
+    assert contract_faucet.eventFunds(hashed_code) == 0
+    with pytest.raises(ContractLogicError):
+        contract_faucet.topUp("devcon", sender=acct1, value=drip_amount * 2)
+    assert contract_faucet.eventFunds(hashed_code) == 0
